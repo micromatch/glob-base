@@ -1,6 +1,8 @@
 # glob-base [![NPM version](https://badge.fury.io/js/glob-base.svg)](http://badge.fury.io/js/glob-base)
 
-> Split a glob into a base path and a pattern.
+> Returns an object with the base path and the actual pattern from a glob.
+
+Use [glob-parent](https://github.com/es128/glob-parent) if you just want the base path.
 
 ## Install with [npm](npmjs.org)
 
@@ -12,6 +14,9 @@ npm i glob-base --save
 
 ```js
 var globBase = require('glob-base');
+
+globBase('a/b/c/**/*.min.js');
+//=> {cwd: 'a/b/c', path: '**/*.min.js'}
 ```
 
 ## Related projects
