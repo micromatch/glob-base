@@ -1,0 +1,51 @@
+{
+  "name": "glob-base",
+  "description": "Returns an object with the base path and the actual pattern from a glob.",
+  "version": "0.1.1",
+  "homepage": "https://github.com/jonschlinkert/glob-base",
+  "author": {
+    "name": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jonschlinkert/glob-base.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jonschlinkert/glob-base/issues"
+  },
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/jonschlinkert/glob-base/blob/master/LICENSE"
+  },
+  "files": [
+    "index.js"
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "glob-parent": "^1.2.0",
+    "is-glob": "^1.1.1"
+  },
+  "devDependencies": {
+    "mocha": "*"
+  },
+  "keywords": [
+    "base",
+    "directory",
+    "dirname",
+    "expression",
+    "glob",
+    "parent",
+    "path",
+    "pattern",
+    "regex",
+    "regular",
+    "root"
+  ]
+}
