@@ -8,44 +8,43 @@
 'use strict';
 
 var path = require('path');
-var isGlob = require('is-glob');
 var parent = require('glob-parent');
 
-module.exports = function globBase(glob) {
-  if (typeof glob !== 'string') {
+module.exports = function globBase(pattern) {
+  if (typeof pattern !== 'string') {
     throw new TypeError('glob-base expects a string.');
   }
 
   var res = {};
-  res.base = parent(glob);
+  res.base = parent(pattern);
+  res.isGlob = res.base !== pattern;
 
   if (res.base !== '.') {
-    res.pattern = glob.substr(res.base.length);
-    if (res.pattern.charAt(0) === '/') {
-      res.pattern = res.pattern.substr(1);
+    res.glob = pattern.substr(res.base.length);
+    if (res.glob.charAt(0) === '/') {
+      res.glob = res.glob.substr(1);
     }
   } else {
-    res.pattern = glob;
+    res.glob = pattern;
   }
 
-  if (res.base === glob) {
-    res.base = dirname(glob);
-    res.pattern = res.base === '.' ? glob : glob.substr(res.base.length);
+  if (!res.isGlob) {
+    res.base = dirname(pattern);
+    res.glob = res.base !== '.'
+      ? pattern.substr(res.base.length)
+      : pattern;
   }
 
-  if (res.pattern.substr(0, 2) === './') {
-    res.pattern = res.pattern.substr(2);
+  if (res.glob.substr(0, 2) === './') {
+    res.glob = res.glob.substr(2);
   }
-
-  if (res.pattern.charAt(0) === '/') {
-    res.pattern = res.pattern.substr(1);
+  if (res.glob.charAt(0) === '/') {
+    res.glob = res.glob.substr(1);
   }
   return res;
-}
+};
 
 function dirname(glob) {
-  if (glob[glob.length - 1] === '/') {
-    return glob;
-  }
+  if (glob.slice(-1) === '/') return glob;
   return path.dirname(glob);
 }
