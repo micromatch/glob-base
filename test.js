@@ -1,471 +1,179 @@
 /*!
  * glob-base <https://github.com/jonschlinkert/glob-base>
  *
- * Copyright (c) 2015 Jon Schlinkert.
- * Licensed under the MIT license.
+ * Copyright (c) 2015, Jon Schlinkert.
+ * Licensed under the MIT License.
  */
 
 'use strict';
 
-var assert = require('assert');
+/* deps:mocha */
+var should = require('should');
 var globBase = require('./');
 
-describe('should get a base path:', function () {
-  it('should extract a base path from a glob pattern:', function () {
-    assert.equal(globBase('.*').base, '.');
-    assert.equal(globBase('.*').pattern, '.*');
-
-    assert.equal(globBase('./*').base, '.');
-    assert.equal(globBase('./*').pattern, '*');
-
-    assert.equal(globBase('*').base, '.');
-    assert.equal(globBase('*').pattern, '*');
-
-    assert.equal(globBase('**').base, '.');
-    assert.equal(globBase('**').pattern, '**');
-
-    assert.equal(globBase('!foo').base, '.');
-    assert.equal(globBase('!foo').pattern, '!foo');
-
-    assert.equal(globBase('**/*.md').base, '.');
-    assert.equal(globBase('**/*.md').pattern, '**/*.md');
-
-    assert.equal(globBase('a/b/c/**/*.min.js').base, 'a/b/c');
-    assert.equal(globBase('a/b/c/**/*.min.js').pattern, '**/*.min.js');
-
-    assert.equal(globBase('**/*.min.js').base, '.');
-    assert.equal(globBase('**/*.min.js').pattern, '**/*.min.js');
-
-    assert.equal(globBase('**/*foo.js').base, '.');
-    assert.equal(globBase('**/*foo.js').pattern, '**/*foo.js');
-
-    assert.equal(globBase('**/.*').base, '.');
-    assert.equal(globBase('**/.*').pattern, '**/.*');
-
-    assert.equal(globBase('**/d').base, '.');
-    assert.equal(globBase('**/d').pattern, '**/d');
-
-    assert.equal(globBase('*.*').base, '.');
-    assert.equal(globBase('*.*').pattern, '*.*');
-
-    assert.equal(globBase('*.js').base, '.');
-    assert.equal(globBase('*.js').pattern, '*.js');
-
-    assert.equal(globBase('*.md').base, '.');
-    assert.equal(globBase('*.md').pattern, '*.md');
-
-    assert.equal(globBase('*.min.js').base, '.');
-    assert.equal(globBase('*.min.js').pattern, '*.min.js');
-
-    assert.equal(globBase('*/*').base, '.');
-    assert.equal(globBase('*/*').pattern, '*/*');
-
-    assert.equal(globBase('*/*/*/*').base, '.');
-    assert.equal(globBase('*/*/*/*').pattern, '*/*/*/*');
-
-    assert.equal(globBase('*/*/*/e').base, '.');
-    assert.equal(globBase('*/*/*/e').pattern, '*/*/*/e');
-
-    assert.equal(globBase('*/b/*/e').base, '.');
-    assert.equal(globBase('*/b/*/e').pattern, '*/b/*/e');
-
-    assert.equal(globBase('*b').base, '.');
-    assert.equal(globBase('*b').pattern, '*b');
-
-    assert.equal(globBase('./a/**/j/**/z/*.md').base, './a');
-    assert.equal(globBase('./a/**/j/**/z/*.md').pattern, '**/j/**/z/*.md');
-
-    assert.equal(globBase('./a/**/z/*.md').base, './a');
-    assert.equal(globBase('./a/**/z/*.md').pattern, '**/z/*.md');
-
-    assert.equal(globBase('./{a/b/{c,/foo.js}/e.f.g}').base, '.');
-    assert.equal(globBase('./{a/b/{c,/foo.js}/e.f.g}').pattern, '{a/b/{c,/foo.js}/e.f.g}');
-
-    assert.equal(globBase('./node_modules/*-glob/**/*.js').base, './node_modules');
-    assert.equal(globBase('./node_modules/*-glob/**/*.js').pattern, '*-glob/**/*.js');
-
-    assert.equal(globBase('a/b/{c,/.gitignore}').base, 'a/b');
-    assert.equal(globBase('a/b/{c,/.gitignore}').pattern, '{c,/.gitignore}');
-
-    assert.equal(globBase('a/b/.{foo,bar}').base, 'a/b');
-    assert.equal(globBase('a/b/.{foo,bar}').pattern, '.{foo,bar}');
-
-    assert.equal(globBase('a/b/*.{foo,bar}').base, 'a/b');
-    assert.equal(globBase('a/b/*.{foo,bar}').pattern, '*.{foo,bar}');
-
-    assert.equal(globBase('a/**/b/*.{foo,bar}').base, 'a');
-    assert.equal(globBase('a/**/b/*.{foo,bar}').pattern, '**/b/*.{foo,bar}');
-
-    assert.equal(globBase('a/b/{c,.gitignore,{a,b}}/{a,b}/abc.foo.js').base, 'a/b');
-    assert.equal(globBase('a/b/{c,.gitignore,{a,b}}/{a,b}/abc.foo.js').pattern, '{c,.gitignore,{a,b}}/{a,b}/abc.foo.js');
-
-    assert.equal(globBase('a/b/{c,d}/').base, 'a/b');
-    assert.equal(globBase('a/b/{c,d}/').pattern, '{c,d}/');
-
-    assert.equal(globBase('a/b/{c,d}/e/f.g').base, 'a/b');
-    assert.equal(globBase('a/b/{c,d}/e/f.g').pattern, '{c,d}/e/f.g');
-
-    assert.equal(globBase('.a*').base, '.');
-    assert.equal(globBase('.a*').pattern, '.a*');
-
-    assert.equal(globBase('.b*').base, '.');
-    assert.equal(globBase('.b*').pattern, '.b*');
-
-    assert.equal(globBase('/*').base, '/');
-    assert.equal(globBase('/*').pattern, '*');
-
-    assert.equal(globBase('a/***').base, 'a');
-    assert.equal(globBase('a/***').pattern, '***');
-
-    assert.equal(globBase('a/**/b/*.{foo,bar}').base, 'a');
-    assert.equal(globBase('a/**/b/*.{foo,bar}').pattern, '**/b/*.{foo,bar}');
-
-    assert.equal(globBase('a/**/c/*').base, 'a');
-    assert.equal(globBase('a/**/c/*').pattern, '**/c/*');
-
-    assert.equal(globBase('a/**/c/*.md').base, 'a');
-    assert.equal(globBase('a/**/c/*.md').pattern, '**/c/*.md');
-
-    assert.equal(globBase('a/**/e').base, 'a');
-    assert.equal(globBase('a/**/e').pattern, '**/e');
-
-    assert.equal(globBase('a/**/j/**/z/*.md').base, 'a');
-    assert.equal(globBase('a/**/j/**/z/*.md').pattern, '**/j/**/z/*.md');
-
-    assert.equal(globBase('a/**/z/*.md').base, 'a');
-    assert.equal(globBase('a/**/z/*.md').pattern, '**/z/*.md');
-
-    assert.equal(globBase('a/**c*').base, 'a');
-    assert.equal(globBase('a/**c*').pattern, '**c*');
-
-    assert.equal(globBase('a/**c/*').base, 'a');
-    assert.equal(globBase('a/**c/*').pattern, '**c/*');
-
-    assert.equal(globBase('a/*/*/e').base, 'a');
-    assert.equal(globBase('a/*/*/e').pattern, '*/*/e');
-
-    assert.equal(globBase('a/*/c/*.md').base, 'a');
-    assert.equal(globBase('a/*/c/*.md').pattern, '*/c/*.md');
-
-    assert.equal(globBase('a/b/**/c{d,e}/**/xyz.md').base, 'a/b');
-    assert.equal(globBase('a/b/**/c{d,e}/**/xyz.md').pattern, '**/c{d,e}/**/xyz.md');
-
-    assert.equal(globBase('a/b/**/e').base, 'a/b');
-    assert.equal(globBase('a/b/**/e').pattern, '**/e');
-
-    assert.equal(globBase('a/b/*.{foo,bar}').base, 'a/b');
-    assert.equal(globBase('a/b/*.{foo,bar}').pattern, '*.{foo,bar}');
-
-    assert.equal(globBase('a/b/*/e').base, 'a/b');
-    assert.equal(globBase('a/b/*/e').pattern, '*/e');
-
-    assert.equal(globBase('a/b/c/*').base, 'a/b/c');
-    assert.equal(globBase('a/b/c/*').pattern, '*');
-
-    assert.equal(globBase('a/b/c/*.md').base, 'a/b/c');
-    assert.equal(globBase('a/b/c/*.md').pattern, '*.md');
-
-    assert.equal(globBase('a/b/c/.*.md').base, 'a/b/c');
-    assert.equal(globBase('a/b/c/.*.md').pattern, '.*.md');
-
-    assert.equal(globBase('b/*/*/*').base, 'b');
-    assert.equal(globBase('b/*/*/*').pattern, '*/*/*');
+describe('glob-base:', function () {
+  it('typical globs:', function () {
+    globBase('!foo').should.eql({ base: '.', isGlob: true, glob: '!foo' });
+    globBase('*').should.eql({ base: '.', isGlob: true, glob: '*' });
+    globBase('**').should.eql({ base: '.', isGlob: true, glob: '**' });
+    globBase('**/*.md').should.eql({ base: '.', isGlob: true, glob: '**/*.md' });
+    globBase('**/*.min.js').should.eql({ base: '.', isGlob: true, glob: '**/*.min.js' });
+    globBase('**/*foo.js').should.eql({ base: '.', isGlob: true, glob: '**/*foo.js' });
+    globBase('**/.*').should.eql({ base: '.', isGlob: true, glob: '**/.*' });
+    globBase('**/d').should.eql({ base: '.', isGlob: true, glob: '**/d' });
+    globBase('*.*').should.eql({ base: '.', isGlob: true, glob: '*.*' });
+    globBase('*.js').should.eql({ base: '.', isGlob: true, glob: '*.js' });
+    globBase('*.md').should.eql({ base: '.', isGlob: true, glob: '*.md' });
+    globBase('*.min.js').should.eql({ base: '.', isGlob: true, glob: '*.min.js' });
+    globBase('*/*').should.eql({ base: '.', isGlob: true, glob: '*/*' });
+    globBase('*/*/*/*').should.eql({ base: '.', isGlob: true, glob: '*/*/*/*' });
+    globBase('*/*/*/e').should.eql({ base: '.', isGlob: true, glob: '*/*/*/e' });
+    globBase('*/b/*/e').should.eql({ base: '.', isGlob: true, glob: '*/b/*/e' });
+    globBase('*b').should.eql({ base: '.', isGlob: true, glob: '*b' });
+    globBase('.*').should.eql({ base: '.', isGlob: true, glob: '.*' });
+    globBase('./*').should.eql({ base: '.', isGlob: true, glob: '*' });
+    globBase('./a/**/j/**/z/*.md').should.eql({ base: './a', isGlob: true, glob: '**/j/**/z/*.md' });
+    globBase('./a/**/z/*.md').should.eql({ base: './a', isGlob: true, glob: '**/z/*.md' });
+    globBase('./node_modules/*-glob/**/*.js').should.eql({ base: './node_modules', isGlob: true, glob: '*-glob/**/*.js' });
+    globBase('./{a/b/{c,/foo.js}/e.f.g}').should.eql({ base: '.', isGlob: true, glob: '{a/b/{c,/foo.js}/e.f.g}' });
+    globBase('.a*').should.eql({ base: '.', isGlob: true, glob: '.a*' });
+    globBase('.b*').should.eql({ base: '.', isGlob: true, glob: '.b*' });
+    globBase('/*').should.eql({ base: '/', isGlob: true, glob: '*' });
+    globBase('a/***').should.eql({ base: 'a', isGlob: true, glob: '***' });
+    globBase('a/**/b/*.{foo,bar}').should.eql({ base: 'a', isGlob: true, glob: '**/b/*.{foo,bar}' });
+    globBase('a/**/c/*').should.eql({ base: 'a', isGlob: true, glob: '**/c/*' });
+    globBase('a/**/c/*.md').should.eql({ base: 'a', isGlob: true, glob: '**/c/*.md' });
+    globBase('a/**/e').should.eql({ base: 'a', isGlob: true, glob: '**/e' });
+    globBase('a/**/j/**/z/*.md').should.eql({ base: 'a', isGlob: true, glob: '**/j/**/z/*.md' });
+    globBase('a/**/z/*.md').should.eql({ base: 'a', isGlob: true, glob: '**/z/*.md' });
+    globBase('a/**c*').should.eql({ base: 'a', isGlob: true, glob: '**c*' });
+    globBase('a/**c/*').should.eql({ base: 'a', isGlob: true, glob: '**c/*' });
+    globBase('a/*/*/e').should.eql({ base: 'a', isGlob: true, glob: '*/*/e' });
+    globBase('a/*/c/*.md').should.eql({ base: 'a', isGlob: true, glob: '*/c/*.md' });
+    globBase('a/b/**/c{d,e}/**/xyz.md').should.eql({ base: 'a/b', isGlob: true, glob: '**/c{d,e}/**/xyz.md' });
+    globBase('a/b/**/e').should.eql({ base: 'a/b', isGlob: true, glob: '**/e' });
+    globBase('a/b/*.{foo,bar}').should.eql({ base: 'a/b', isGlob: true, glob: '*.{foo,bar}' });
+    globBase('a/b/*/e').should.eql({ base: 'a/b', isGlob: true, glob: '*/e' });
+    globBase('a/b/.git/').should.eql({ base: 'a/b/.git/', isGlob: false, glob: '' });
+    globBase('a/b/.git/**').should.eql({ base: 'a/b/.git', isGlob: true, glob: '**' });
+    globBase('a/b/.{foo,bar}').should.eql({ base: 'a/b', isGlob: true, glob: '.{foo,bar}' });
+    globBase('a/b/c/*').should.eql({ base: 'a/b/c', isGlob: true, glob: '*' });
+    globBase('a/b/c/**/*.min.js').should.eql({ base: 'a/b/c', isGlob: true, glob: '**/*.min.js' });
+    globBase('a/b/c/*.md').should.eql({ base: 'a/b/c', isGlob: true, glob: '*.md' });
+    globBase('a/b/c/.*.md').should.eql({ base: 'a/b/c', isGlob: true, glob: '.*.md' });
+    globBase('a/b/{c,.gitignore,{a,b}}/{a,b}/abc.foo.js').should.eql({ base: 'a/b', isGlob: true, glob: '{c,.gitignore,{a,b}}/{a,b}/abc.foo.js' });
+    globBase('a/b/{c,/.gitignore}').should.eql({ base: 'a/b', isGlob: true, glob: '{c,/.gitignore}' });
+    globBase('a/b/{c,d}/').should.eql({ base: 'a/b', isGlob: true, glob: '{c,d}/' });
+    globBase('a/b/{c,d}/e/f.g').should.eql({ base: 'a/b', isGlob: true, glob: '{c,d}/e/f.g' });
+    globBase('b/*/*/*').should.eql({ base: 'b', isGlob: true, glob: '*/*/*' });
   });
-
   it('file extensions:', function () {
-    assert.equal(globBase('.md').base, '.');
-    assert.equal(globBase('.md').pattern, '.md');
+    globBase('.md').should.eql({ base: '.', isGlob: false, glob: '.md' });
   });
-
   it('negation pattern:', function () {
-    assert.equal(globBase('!*.min.js').base, '.');
-    assert.equal(globBase('!*.min.js').pattern, '!*.min.js');
-
-    assert.equal(globBase('!foo').base, '.');
-    assert.equal(globBase('!foo').pattern, '!foo');
-
-    assert.equal(globBase('a/b/c/!foo').base, 'a/b/c');
-    assert.equal(globBase('a/b/c/!foo').pattern, '!foo');
-
-    assert.equal(globBase('!foo/(a|b).min.js').base, '.');
-    assert.equal(globBase('!foo/(a|b).min.js').pattern, '!foo/(a|b).min.js');
-
-    assert.equal(globBase('!foo/[a-b].min.js').base, '.');
-    assert.equal(globBase('!foo/[a-b].min.js').pattern, '!foo/[a-b].min.js');
-
-    assert.equal(globBase('!foo/{a,b}.min.js').base, '.');
-    assert.equal(globBase('!foo/{a,b}.min.js').pattern, '!foo/{a,b}.min.js');
+    globBase('!*.min.js').should.eql({ base: '.', isGlob: true, glob: '!*.min.js' });
+    globBase('!foo').should.eql({ base: '.', isGlob: true, glob: '!foo' });
+    globBase('a/b/c/!foo').should.eql({ base: 'a/b/c', isGlob: true, glob: '!foo' });
+    globBase('!foo/(a|b).min.js').should.eql({ base: '.', isGlob: true, glob: '!foo/(a|b).min.js' });
+    globBase('!foo/[a-b].min.js').should.eql({ base: '.', isGlob: true, glob: '!foo/[a-b].min.js' });
+    globBase('!foo/{a,b}.min.js').should.eql({ base: '.', isGlob: true, glob: '!foo/{a,b}.min.js' });
   });
-
-  describe('braces:', function () {
-    it('should know when a base cannot be extracted:', function () {
-      assert.equal(globBase('/a/b/{c,/foo.js}/e.f.g/').base, '/a/b');
-      assert.equal(globBase('/a/b/{c,/foo.js}/e.f.g/').pattern, '{c,/foo.js}/e.f.g/');
-
-      assert.equal(globBase('{a/b/c.js,/a/b/{c,/foo.js}/e.f.g/}').base, '.');
-      assert.equal(globBase('{a/b/c.js,/a/b/{c,/foo.js}/e.f.g/}').pattern, '{a/b/c.js,/a/b/{c,/foo.js}/e.f.g/}');
-
-      assert.equal(globBase('/a/b/{c,d}/').base, '/a/b');
-      assert.equal(globBase('/a/b/{c,d}/').pattern, '{c,d}/');
-
-      assert.equal(globBase('/a/b/{c,d}/*.js').base, '/a/b');
-      assert.equal(globBase('/a/b/{c,d}/*.js').pattern, '{c,d}/*.js');
-
-      assert.equal(globBase('/a/b/{c,d}/*.min.js').base, '/a/b');
-      assert.equal(globBase('/a/b/{c,d}/*.min.js').pattern, '{c,d}/*.min.js');
-
-      assert.equal(globBase('/a/b/{c,d}/e.f.g/').base, '/a/b');
-      assert.equal(globBase('/a/b/{c,d}/e.f.g/').pattern, '{c,d}/e.f.g/');
-
-      assert.equal(globBase('{.,*}').base, '.');
-      assert.equal(globBase('{.,*}').pattern, '{.,*}');
-    });
-
-    it('should work when the filename has braces:', function () {
-      assert.equal(globBase('a/b/.{c,.gitignore}').base, 'a/b');
-      assert.equal(globBase('a/b/.{c,.gitignore}').pattern, '.{c,.gitignore}');
-
-      assert.equal(globBase('a/b/.{c,/.gitignore}').base, 'a/b');
-      assert.equal(globBase('a/b/.{c,/.gitignore}').pattern, '.{c,/.gitignore}');
-
-      assert.equal(globBase('a/b/.{foo,bar}').base, 'a/b');
-      assert.equal(globBase('a/b/.{foo,bar}').pattern, '.{foo,bar}');
-
-      assert.equal(globBase('a/b/{c,.gitignore}').base, 'a/b');
-      assert.equal(globBase('a/b/{c,.gitignore}').pattern, '{c,.gitignore}');
-
-      assert.equal(globBase('a/b/{c,/.gitignore}').base, 'a/b');
-      assert.equal(globBase('a/b/{c,/.gitignore}').pattern, '{c,/.gitignore}');
-
-      assert.equal(globBase('a/b/{c,/gitignore}').base, 'a/b');
-      assert.equal(globBase('a/b/{c,/gitignore}').pattern, '{c,/gitignore}');
-
-      assert.equal(globBase('a/b/{c,d}').base, 'a/b');
-      assert.equal(globBase('a/b/{c,d}').pattern, '{c,d}');
-    });
-
-    it('should work when the dirname has braces:', function () {
-      assert.equal(globBase('a/b/{c,./d}/e/f.g').base, 'a/b');
-      assert.equal(globBase('a/b/{c,./d}/e/f.g').pattern, '{c,./d}/e/f.g');
-
-      assert.equal(globBase('a/b/{c,./d}/e/f.min.g').base, 'a/b');
-      assert.equal(globBase('a/b/{c,./d}/e/f.min.g').pattern, '{c,./d}/e/f.min.g');
-
-      assert.equal(globBase('a/b/{c,.gitignore,{a,./b}}/{a,b}/abc.foo.js').base, 'a/b');
-      assert.equal(globBase('a/b/{c,.gitignore,{a,./b}}/{a,b}/abc.foo.js').pattern, '{c,.gitignore,{a,./b}}/{a,b}/abc.foo.js');
-
-      assert.equal(globBase('a/b/{c,.gitignore,{a,b}}/{a,b}/*.foo.js').base, 'a/b');
-      assert.equal(globBase('a/b/{c,.gitignore,{a,b}}/{a,b}/*.foo.js').pattern, '{c,.gitignore,{a,b}}/{a,b}/*.foo.js');
-
-      assert.equal(globBase('a/b/{c,.gitignore,{a,b}}/{a,b}/abc.foo.js').base, 'a/b');
-      assert.equal(globBase('a/b/{c,.gitignore,{a,b}}/{a,b}/abc.foo.js').pattern, '{c,.gitignore,{a,b}}/{a,b}/abc.foo.js');
-
-      assert.equal(globBase('a/b/{c,/d}/e/f.g').base, 'a/b');
-      assert.equal(globBase('a/b/{c,/d}/e/f.g').pattern, '{c,/d}/e/f.g');
-
-      assert.equal(globBase('a/b/{c,/d}/e/f.min.g').base, 'a/b');
-      assert.equal(globBase('a/b/{c,/d}/e/f.min.g').pattern, '{c,/d}/e/f.min.g');
-
-      assert.equal(globBase('a/b/{c,d}/').base, 'a/b');
-      assert.equal(globBase('a/b/{c,d}/').pattern, '{c,d}/');
-
-      assert.equal(globBase('a/b/{c,d}/*.js').base, 'a/b');
-      assert.equal(globBase('a/b/{c,d}/*.js').pattern, '{c,d}/*.js');
-
-      assert.equal(globBase('a/b/{c,d}/*.min.js').base, 'a/b');
-      assert.equal(globBase('a/b/{c,d}/*.min.js').pattern, '{c,d}/*.min.js');
-
-      assert.equal(globBase('a/b/{c,d}/e.f.g/').base, 'a/b');
-      assert.equal(globBase('a/b/{c,d}/e.f.g/').pattern, '{c,d}/e.f.g/');
-
-      assert.equal(globBase('a/b/{c,d}/e/f.g').base, 'a/b');
-      assert.equal(globBase('a/b/{c,d}/e/f.g').pattern, '{c,d}/e/f.g');
-
-      assert.equal(globBase('a/b/{c,d}/e/f.min.g').base, 'a/b');
-      assert.equal(globBase('a/b/{c,d}/e/f.min.g').pattern, '{c,d}/e/f.min.g');
-
-      assert.equal(globBase('foo/{a,b}.min.js').base, 'foo');
-      assert.equal(globBase('foo/{a,b}.min.js').pattern, '{a,b}.min.js');
-    });
+  it('extglobs:', function () {
+    globBase('/a/b/!(a|b)/e.f.g/').should.eql({ base: '/a/b', isGlob: true, glob: '!(a|b)/e.f.g/' });
+    globBase('/a/b/@(a|b)/e.f.g/').should.eql({ base: '/a/b', isGlob: true, glob: '@(a|b)/e.f.g/' });
+    globBase('@(a|b)/e.f.g/').should.eql({ base: '.', isGlob: true, glob: '@(a|b)/e.f.g/' });
   });
-
-  it('character classes:', function () {
-    assert.equal(globBase('[a-c]b*').base, '.');
-    assert.equal(globBase('[a-c]b*').pattern, '[a-c]b*');
-
-    assert.equal(globBase('[a-j]*[^c]').base, '.');
-    assert.equal(globBase('[a-j]*[^c]').pattern, '[a-j]*[^c]');
-
-    assert.equal(globBase('[a-j]*[^c]b/c').base, '.');
-    assert.equal(globBase('[a-j]*[^c]b/c').pattern, '[a-j]*[^c]b/c');
-
-    assert.equal(globBase('[a-j]*[^c]bc').base, '.');
-    assert.equal(globBase('[a-j]*[^c]bc').pattern, '[a-j]*[^c]bc');
-
-    assert.equal(globBase('[ab][ab]').base, '.');
-    assert.equal(globBase('[ab][ab]').pattern, '[ab][ab]');
-
-    assert.equal(globBase('foo/[a-b].min.js').base, 'foo');
-    assert.equal(globBase('foo/[a-b].min.js').pattern, '[a-b].min.js');
+  it('braces: no base:', function () {
+    globBase('/a/b/{c,/foo.js}/e.f.g/').should.eql({ base: '/a/b', isGlob: true, glob: '{c,/foo.js}/e.f.g/' });
+    globBase('{a/b/c.js,/a/b/{c,/foo.js}/e.f.g/}').should.eql({ base: '.', isGlob: true, glob: '{a/b/c.js,/a/b/{c,/foo.js}/e.f.g/}' });
+    globBase('/a/b/{c,d}/').should.eql({ base: '/a/b', isGlob: true, glob: '{c,d}/' });
+    globBase('/a/b/{c,d}/*.js').should.eql({ base: '/a/b', isGlob: true, glob: '{c,d}/*.js' });
+    globBase('/a/b/{c,d}/*.min.js').should.eql({ base: '/a/b', isGlob: true, glob: '{c,d}/*.min.js' });
+    globBase('/a/b/{c,d}/e.f.g/').should.eql({ base: '/a/b', isGlob: true, glob: '{c,d}/e.f.g/' });
+    globBase('{.,*}').should.eql({ base: '.', isGlob: true, glob: '{.,*}' });
   });
-
+  it('braces in filename:', function () {
+    globBase('a/b/.{c,.gitignore}').should.eql({ base: 'a/b', isGlob: true, glob: '.{c,.gitignore}' });
+    globBase('a/b/.{c,/.gitignore}').should.eql({ base: 'a/b', isGlob: true, glob: '.{c,/.gitignore}' });
+    globBase('a/b/.{foo,bar}').should.eql({ base: 'a/b', isGlob: true, glob: '.{foo,bar}' });
+    globBase('a/b/{c,.gitignore}').should.eql({ base: 'a/b', isGlob: true, glob: '{c,.gitignore}' });
+    globBase('a/b/{c,/.gitignore}').should.eql({ base: 'a/b', isGlob: true, glob: '{c,/.gitignore}' });
+    globBase('a/b/{c,/gitignore}').should.eql({ base: 'a/b', isGlob: true, glob: '{c,/gitignore}' });
+    globBase('a/b/{c,d}').should.eql({ base: 'a/b', isGlob: true, glob: '{c,d}' });
+  });
+  it('braces in dirname:', function () {
+    globBase('a/b/{c,./d}/e/f.g').should.eql({ base: 'a/b', isGlob: true, glob: '{c,./d}/e/f.g' });
+    globBase('a/b/{c,./d}/e/f.min.g').should.eql({ base: 'a/b', isGlob: true, glob: '{c,./d}/e/f.min.g' });
+    globBase('a/b/{c,.gitignore,{a,./b}}/{a,b}/abc.foo.js').should.eql({ base: 'a/b', isGlob: true, glob: '{c,.gitignore,{a,./b}}/{a,b}/abc.foo.js' });
+    globBase('a/b/{c,.gitignore,{a,b}}/{a,b}/*.foo.js').should.eql({ base: 'a/b', isGlob: true, glob: '{c,.gitignore,{a,b}}/{a,b}/*.foo.js' });
+    globBase('a/b/{c,.gitignore,{a,b}}/{a,b}/abc.foo.js').should.eql({ base: 'a/b', isGlob: true, glob: '{c,.gitignore,{a,b}}/{a,b}/abc.foo.js' });
+    globBase('a/b/{c,/d}/e/f.g').should.eql({ base: 'a/b', isGlob: true, glob: '{c,/d}/e/f.g' });
+    globBase('a/b/{c,/d}/e/f.min.g').should.eql({ base: 'a/b', isGlob: true, glob: '{c,/d}/e/f.min.g' });
+    globBase('a/b/{c,d}/').should.eql({ base: 'a/b', isGlob: true, glob: '{c,d}/' });
+    globBase('a/b/{c,d}/*.js').should.eql({ base: 'a/b', isGlob: true, glob: '{c,d}/*.js' });
+    globBase('a/b/{c,d}/*.min.js').should.eql({ base: 'a/b', isGlob: true, glob: '{c,d}/*.min.js' });
+    globBase('a/b/{c,d}/e.f.g/').should.eql({ base: 'a/b', isGlob: true, glob: '{c,d}/e.f.g/' });
+    globBase('a/b/{c,d}/e/f.g').should.eql({ base: 'a/b', isGlob: true, glob: '{c,d}/e/f.g' });
+    globBase('a/b/{c,d}/e/f.min.g').should.eql({ base: 'a/b', isGlob: true, glob: '{c,d}/e/f.min.g' });
+    globBase('foo/{a,b}.min.js').should.eql({ base: 'foo', isGlob: true, glob: '{a,b}.min.js' });
+  });
+  it('regex character classes:', function () {
+    globBase('[a-c]b*').should.eql({ base: '.', isGlob: true, glob: '[a-c]b*' });
+    globBase('[a-j]*[^c]').should.eql({ base: '.', isGlob: true, glob: '[a-j]*[^c]' });
+    globBase('[a-j]*[^c]b/c').should.eql({ base: '.', isGlob: true, glob: '[a-j]*[^c]b/c' });
+    globBase('[a-j]*[^c]bc').should.eql({ base: '.', isGlob: true, glob: '[a-j]*[^c]bc' });
+    globBase('[ab][ab]').should.eql({ base: '.', isGlob: true, glob: '[ab][ab]' });
+    globBase('foo/[a-b].min.js').should.eql({ base: 'foo', isGlob: true, glob: '[a-b].min.js' });
+  });
   it('qmarks:', function () {
-    assert.equal(globBase('?').base, '.');
-    assert.equal(globBase('?').pattern, '?');
-
-    assert.equal(globBase('?/?').base, '.');
-    assert.equal(globBase('?/?').pattern, '?/?');
-
-    assert.equal(globBase('??').base, '.');
-    assert.equal(globBase('??').pattern, '??');
-
-    assert.equal(globBase('???').base, '.');
-    assert.equal(globBase('???').pattern, '???');
-
-    assert.equal(globBase('?a').base, '.');
-    assert.equal(globBase('?a').pattern, '?a');
-
-    assert.equal(globBase('?b').base, '.');
-    assert.equal(globBase('?b').pattern, '?b');
-
-    assert.equal(globBase('a?b').base, '.');
-    assert.equal(globBase('a?b').pattern, 'a?b');
-
-    assert.equal(globBase('a/?/c.js').base, 'a');
-    assert.equal(globBase('a/?/c.js').pattern, '?/c.js');
-
-    assert.equal(globBase('a/?/c.md').base, 'a');
-    assert.equal(globBase('a/?/c.md').pattern, '?/c.md');
-
-    assert.equal(globBase('a/?/c/?/*/f.js').base, 'a');
-    assert.equal(globBase('a/?/c/?/*/f.js').pattern, '?/c/?/*/f.js');
-
-    assert.equal(globBase('a/?/c/?/*/f.md').base, 'a');
-    assert.equal(globBase('a/?/c/?/*/f.md').pattern, '?/c/?/*/f.md');
-
-    assert.equal(globBase('a/?/c/?/e.js').base, 'a');
-    assert.equal(globBase('a/?/c/?/e.js').pattern, '?/c/?/e.js');
-
-    assert.equal(globBase('a/?/c/?/e.md').base, 'a');
-    assert.equal(globBase('a/?/c/?/e.md').pattern, '?/c/?/e.md');
-
-    assert.equal(globBase('a/?/c/???/e.js').base, 'a');
-    assert.equal(globBase('a/?/c/???/e.js').pattern, '?/c/???/e.js');
-
-    assert.equal(globBase('a/?/c/???/e.md').base, 'a');
-    assert.equal(globBase('a/?/c/???/e.md').pattern, '?/c/???/e.md');
-
-    assert.equal(globBase('a/??/c.js').base, 'a');
-    assert.equal(globBase('a/??/c.js').pattern, '??/c.js');
-
-    assert.equal(globBase('a/??/c.md').base, 'a');
-    assert.equal(globBase('a/??/c.md').pattern, '??/c.md');
-
-    assert.equal(globBase('a/???/c.js').base, 'a');
-    assert.equal(globBase('a/???/c.js').pattern, '???/c.js');
-
-    assert.equal(globBase('a/???/c.md').base, 'a');
-    assert.equal(globBase('a/???/c.md').pattern, '???/c.md');
-
-    assert.equal(globBase('a/????/c.js').base, 'a');
-    assert.equal(globBase('a/????/c.js').pattern, '????/c.js');
+    globBase('?').should.eql({ base: '.', isGlob: true, glob: '?' });
+    globBase('?/?').should.eql({ base: '.', isGlob: true, glob: '?/?' });
+    globBase('??').should.eql({ base: '.', isGlob: true, glob: '??' });
+    globBase('???').should.eql({ base: '.', isGlob: true, glob: '???' });
+    globBase('?a').should.eql({ base: '.', isGlob: true, glob: '?a' });
+    globBase('?b').should.eql({ base: '.', isGlob: true, glob: '?b' });
+    globBase('a?b').should.eql({ base: '.', isGlob: true, glob: 'a?b' });
+    globBase('a/?/c.js').should.eql({ base: 'a', isGlob: true, glob: '?/c.js' });
+    globBase('a/?/c.md').should.eql({ base: 'a', isGlob: true, glob: '?/c.md' });
+    globBase('a/?/c/?/*/f.js').should.eql({ base: 'a', isGlob: true, glob: '?/c/?/*/f.js' });
+    globBase('a/?/c/?/*/f.md').should.eql({ base: 'a', isGlob: true, glob: '?/c/?/*/f.md' });
+    globBase('a/?/c/?/e.js').should.eql({ base: 'a', isGlob: true, glob: '?/c/?/e.js' });
+    globBase('a/?/c/?/e.md').should.eql({ base: 'a', isGlob: true, glob: '?/c/?/e.md' });
+    globBase('a/?/c/???/e.js').should.eql({ base: 'a', isGlob: true, glob: '?/c/???/e.js' });
+    globBase('a/?/c/???/e.md').should.eql({ base: 'a', isGlob: true, glob: '?/c/???/e.md' });
+    globBase('a/??/c.js').should.eql({ base: 'a', isGlob: true, glob: '??/c.js' });
+    globBase('a/??/c.md').should.eql({ base: 'a', isGlob: true, glob: '??/c.md' });
+    globBase('a/???/c.js').should.eql({ base: 'a', isGlob: true, glob: '???/c.js' });
+    globBase('a/???/c.md').should.eql({ base: 'a', isGlob: true, glob: '???/c.md' });
+    globBase('a/????/c.js').should.eql({ base: 'a', isGlob: true, glob: '????/c.js' });
   });
-
   it('non-glob pattern:', function () {
-    assert.equal(globBase('').base, '.');
-    assert.equal(globBase('').pattern, '');
-
-    assert.equal(globBase('.').base, '.');
-    assert.equal(globBase('.').pattern, '.');
-
-    assert.equal(globBase('a').base, '.');
-    assert.equal(globBase('a').pattern, 'a');
-
-    assert.equal(globBase('.a').base, '.');
-    assert.equal(globBase('.a').pattern, '.a');
-
-    assert.equal(globBase('/a').base, '/');
-    assert.equal(globBase('/a').pattern, 'a');
-
-    assert.equal(globBase('a/').base, 'a/');
-    assert.equal(globBase('a/').pattern, '');
-
-    assert.equal(globBase('/a/').base, '/a/');
-    assert.equal(globBase('/a/').pattern, '');
-
-    assert.equal(globBase('/a/b/c').base, '/a/b');
-    assert.equal(globBase('/a/b/c').pattern, 'c');
-
-    assert.equal(globBase('/a/b/c/').base, '/a/b/c/');
-    assert.equal(globBase('/a/b/c/').pattern, '');
-
-    assert.equal(globBase('a/b/c/').base, 'a/b/c/');
-    assert.equal(globBase('a/b/c/').pattern, '');
-
-    assert.equal(globBase('a.min.js').base, '.');
-    assert.equal(globBase('a.min.js').pattern, 'a.min.js');
-
-    assert.equal(globBase('a/.x.md').base, 'a');
-    assert.equal(globBase('a/.x.md').pattern, '.x.md');
-
-    assert.equal(globBase('a/b/.gitignore').base, 'a/b');
-    assert.equal(globBase('a/b/.gitignore').pattern, '.gitignore');
-
-    assert.equal(globBase('a/b/c/d.md').base, 'a/b/c');
-    assert.equal(globBase('a/b/c/d.md').pattern, 'd.md');
-
-    assert.equal(globBase('a/b/c/d.e.f/g.min.js').base, 'a/b/c/d.e.f');
-    assert.equal(globBase('a/b/c/d.e.f/g.min.js').pattern, 'g.min.js');
-
-    assert.equal(globBase('a/b/.git').base, 'a/b');
-    assert.equal(globBase('a/b/.git').pattern, '.git');
-
-    assert.equal(globBase('a/b/.git/').base, 'a/b/.git/');
-    assert.equal(globBase('a/b/.git/').pattern, '');
-
-    assert.equal(globBase('a/b/.git/').base, 'a/b/.git/');
-    assert.equal(globBase('a/b/.git/**').pattern, '**');
-
-    assert.equal(globBase('a/b/.gitignore').base, 'a/b');
-    assert.equal(globBase('a/b/.gitignore').pattern, '.gitignore');
-
-    assert.equal(globBase('a/b/c').base, 'a/b');
-    assert.equal(globBase('a/b/c').pattern, 'c');
-
-    assert.equal(globBase('a/b/c.d/e.md').base, 'a/b/c.d');
-    assert.equal(globBase('a/b/c.d/e.md').pattern, 'e.md');
-
-    assert.equal(globBase('a/b/c.md').base, 'a/b');
-    assert.equal(globBase('a/b/c.md').pattern, 'c.md');
-
-    assert.equal(globBase('a/b/c.min.js').base, 'a/b');
-    assert.equal(globBase('a/b/c.min.js').pattern, 'c.min.js');
-
-    assert.equal(globBase('a/b/c/').base, 'a/b/c/');
-    assert.equal(globBase('a/b/c/').pattern, '');
-
-    assert.equal(globBase('a/b/c/d.e.f/g.min.js').base, 'a/b/c/d.e.f');
-    assert.equal(globBase('a/b/c/d.e.f/g.min.js').pattern, 'g.min.js');
-
-    assert.equal(globBase('a/b/c/d.md').base, 'a/b/c');
-    assert.equal(globBase('a/b/c/d.md').pattern, 'd.md');
-
-    assert.equal(globBase('a/b/git/').base, 'a/b/git/');
-    assert.equal(globBase('a/b/git/').pattern, '');
-
-    assert.equal(globBase('aa').base, '.');
-    assert.equal(globBase('aa').pattern, 'aa');
-
-    assert.equal(globBase('ab').base, '.');
-    assert.equal(globBase('ab').pattern, 'ab');
-
-    assert.equal(globBase('bb').base, '.');
-    assert.equal(globBase('bb').pattern, 'bb');
-
-    assert.equal(globBase('c.md').base, '.');
-    assert.equal(globBase('c.md').pattern, 'c.md');
-
-    assert.equal(globBase('foo').base, '.');
-    assert.equal(globBase('foo').pattern, 'foo');
+    globBase('').should.eql({ base: '.', isGlob: false, glob: '' });
+    globBase('.').should.eql({ base: '.', isGlob: false, glob: '.' });
+    globBase('a').should.eql({ base: '.', isGlob: false, glob: 'a' });
+    globBase('.a').should.eql({ base: '.', isGlob: false, glob: '.a' });
+    globBase('/a').should.eql({ base: '/', isGlob: false, glob: 'a' });
+    globBase('a/').should.eql({ base: 'a/', isGlob: false, glob: '' });
+    globBase('/a/').should.eql({ base: '/a/', isGlob: false, glob: '' });
+    globBase('/a/b/c').should.eql({ base: '/a/b', isGlob: false, glob: 'c' });
+    globBase('/a/b/c/').should.eql({ base: '/a/b/c/', isGlob: false, glob: '' });
+    globBase('a/b/c/').should.eql({ base: 'a/b/c/', isGlob: false, glob: '' });
+    globBase('a.min.js').should.eql({ base: '.', isGlob: false, glob: 'a.min.js' });
+    globBase('a/.x.md').should.eql({ base: 'a', isGlob: false, glob: '.x.md' });
+    globBase('a/b/.gitignore').should.eql({ base: 'a/b', isGlob: false, glob: '.gitignore' });
+    globBase('a/b/c/d.md').should.eql({ base: 'a/b/c', isGlob: false, glob: 'd.md' });
+    globBase('a/b/c/d.e.f/g.min.js').should.eql({ base: 'a/b/c/d.e.f', isGlob: false, glob: 'g.min.js' });
+    globBase('a/b/.git').should.eql({ base: 'a/b', isGlob: false, glob: '.git' });
+    globBase('a/b/.git/').should.eql({ base: 'a/b/.git/', isGlob: false, glob: '' });
+    globBase('a/b/c').should.eql({ base: 'a/b', isGlob: false, glob: 'c' });
+    globBase('a/b/c.d/e.md').should.eql({ base: 'a/b/c.d', isGlob: false, glob: 'e.md' });
+    globBase('a/b/c.md').should.eql({ base: 'a/b', isGlob: false, glob: 'c.md' });
+    globBase('a/b/c.min.js').should.eql({ base: 'a/b', isGlob: false, glob: 'c.min.js' });
+    globBase('a/b/git/').should.eql({ base: 'a/b/git/', isGlob: false, glob: '' });
+    globBase('aa').should.eql({ base: '.', isGlob: false, glob: 'aa' });
+    globBase('ab').should.eql({ base: '.', isGlob: false, glob: 'ab' });
+    globBase('bb').should.eql({ base: '.', isGlob: false, glob: 'bb' });
+    globBase('c.md').should.eql({ base: '.', isGlob: false, glob: 'c.md' });
+    globBase('foo').should.eql({ base: '.', isGlob: false, glob: 'foo' });
   });
 });
