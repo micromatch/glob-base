@@ -1,7 +1,7 @@
 {
   "name": "glob-base",
-  "description": "Returns an object with the base path and the actual pattern from a glob.",
-  "version": "0.1.1",
+  "description": "Returns an object with the (non-glob) base path and the actual pattern.",
+  "version": "0.2.0",
   "homepage": "https://github.com/jonschlinkert/glob-base",
   "author": {
     "name": "Jon Schlinkert",
@@ -29,11 +29,11 @@
     "test": "mocha"
   },
   "dependencies": {
-    "glob-parent": "^1.2.0",
-    "is-glob": "^1.1.1"
+    "glob-parent": "^1.2.0"
   },
   "devDependencies": {
-    "mocha": "*"
+    "mocha": "*",
+    "should": "^5.1.0"
   },
   "keywords": [
     "base",
