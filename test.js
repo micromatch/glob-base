@@ -387,6 +387,12 @@ describe('should get a base path:', function () {
     assert.equal(globBase('/a').base, '/');
     assert.equal(globBase('/a').pattern, 'a');
 
+    assert.equal(globBase('a/').base, 'a/');
+    assert.equal(globBase('a/').pattern, '');
+
+    assert.equal(globBase('/a/').base, '/a/');
+    assert.equal(globBase('/a/').pattern, '');
+
     assert.equal(globBase('/a/b/c').base, '/a/b');
     assert.equal(globBase('/a/b/c').pattern, 'c');
 
