@@ -29,7 +29,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "glob-parent": "^1.2.0"
+    "glob-parent": "^2.0.0"
   },
   "devDependencies": {
     "mocha": "*",
