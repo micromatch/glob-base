@@ -73,7 +73,7 @@ describe('glob-base:', function () {
   it('negation pattern:', function () {
     globBase('!*.min.js').should.eql({ base: '.', isGlob: true, glob: '!*.min.js' });
     globBase('!foo').should.eql({ base: '.', isGlob: true, glob: '!foo' });
-    globBase('a/b/c/!foo').should.eql({ base: 'a/b/c', isGlob: true, glob: '!foo' });
+    globBase('a/b/c/!(foo)').should.eql({ base: 'a/b/c', isGlob: true, glob: '!(foo)' });
     globBase('!foo/(a|b).min.js').should.eql({ base: '.', isGlob: true, glob: '!foo/(a|b).min.js' });
     globBase('!foo/[a-b].min.js').should.eql({ base: '.', isGlob: true, glob: '!foo/[a-b].min.js' });
     globBase('!foo/{a,b}.min.js').should.eql({ base: '.', isGlob: true, glob: '!foo/{a,b}.min.js' });
